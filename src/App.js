@@ -8,6 +8,7 @@ function App() {
   const dispatch = useDispatch();
 
   const data = useSelector(state => state.data)
+  const status = useSelector(state => state.status)
 
   useEffect(()=>{
     dispatch({
@@ -23,11 +24,25 @@ function App() {
       </h1>
 
       <div>
+      {
+          status === 'loading' && (
+            <div>Loading...</div>
+          )
+        }
+        {
+          status === 'error' && (
+            <div>Failed</div>
+          )
+        }
+        {
+          status === 'success' && (
           <div>{
-              data?.length > 0 && data.map(person => (
+              data.length > 0 && data.map(person => (
                 <PersonCard data={person} key={person.name}/>
               ))
             }</div>
+          )
+        }
       </div>
     </div>
   );
@@ -39,8 +54,6 @@ const PersonCard = ({data}) => {
   return (
     <div className="card">
       <div>{data.name}</div>
-      {/* <div>{data.homeworld}</div> */}
-      {/* <div>{data.films}</div> */}
     </div>
   )
 }

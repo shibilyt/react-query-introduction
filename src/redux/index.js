@@ -7,20 +7,36 @@ import axios from 'axios';
 
 const initialState = {
     data: null,
+    status: 'idle',
+    error: null,
 }
 
 function reducer(state = initialState, action){
 
     switch (action.type) {
 
-        case 'api/success':
-            return {
-                ...state,
-                data: action.payload.data,
-            }
-        
-        default:
-            return state;
+      case 'api/fetch':
+        return {
+            ...state,
+            status: 'loading',
+        }
+
+      case 'api/success':
+        return {
+            ...state,
+            status: 'success',
+            data: action.payload.data,
+        }
+    
+      case 'api/failed': 
+        return {
+          ...state,
+          status: 'error',
+          error: action.error
+        }
+
+      default:
+          return state;
     }
 }
 
@@ -47,6 +63,10 @@ function* fetchData(){
     })
   }
   catch(error) {
+    yield put({
+      type: 'api/failed',
+      error
+    })
   }
 }
 
