@@ -1,26 +1,16 @@
 import './App.css';
-import { useSelector, useDispatch } from 'react-redux';
-import { useEffect } from 'react';
+import { useQuery } from 'react-query';
+import axios from 'axios'
 
 
 function App() {
 
-  const dispatch = useDispatch();
-
-  const data = useSelector(state => state.data)
-  const status = useSelector(state => state.status)
-
-  useEffect(()=>{
-    dispatch({
-      type: 'api/fetch'
-    })
-  },[dispatch])
-
-
+  const {data, status} = useQuery('people', () => axios.get('https://swapi.dev/api/people').then(res => res.data.results))
+  
   return (
     <div className="App">
       <h1 className="header">
-      Swapi with redux
+      Swapi with react query
       </h1>
 
       <div>
