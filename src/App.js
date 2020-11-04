@@ -1,12 +1,19 @@
 import './App.css';
-import { useQuery } from 'react-query';
+import { useState } from 'react';
+import { usePaginatedQuery } from 'react-query';
 import axios from 'axios'
+async function fetchSwapi(_key, page){
+  await new Promise(res => setTimeout(res, 1500))
 
+  return axios.get(`https://swapi.dev/api/people?page=${page}`).then(res => res.data)
+}
 
 function App() {
 
-  const {data, status} = useQuery('people', () => axios.get('https://swapi.dev/api/people').then(res => res.data.results))
+  const [page, setPage] = useState(1);
   
+  const {resolvedData, latestData, status, isFetching} = usePaginatedQuery(['people', page],fetchSwapi)
+
   return (
     <div className="App">
       <h1 className="header">
@@ -27,11 +34,20 @@ function App() {
         {
           status === 'success' && (
           <div>{
-              data.length > 0 && data.map(person => (
+              resolvedData?.results?.length > 0 && resolvedData.results.map(person => (
                 <PersonCard data={person} key={person.name}/>
               ))
-            }</div>
+            }
+            
+            <button className="btn" onClick={() => setPage((old) => old - 1)} disabled={page === 1}>prev</button>
+            <button className="btn" onClick={() => setPage((old) => old + 1)}
+        disabled={!latestData?.next}>next</button>
+            </div>
+
           )
+        }
+        {
+          isFetching && '...'
         }
       </div>
     </div>
@@ -46,6 +62,16 @@ const PersonCard = ({data}) => {
       <div>{data.name}</div>
     </div>
   )
+}
+
+
+function getParameterByName(name, url) {
+  name = name.replace(/[\[\]]/g, '\\$&');
+  var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+      results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
 export default App;
