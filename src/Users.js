@@ -36,14 +36,30 @@ createServer({
 
 export default function Users(){
 
-    const queryCache = useQueryCache();
+  const queryCache = useQueryCache();
 
-    const {data, status, isFetching} = useQuery('users', () => axios.get('/api/users').then(res => res.data.users))
-    const [mutate, mutateObj] = useMutation(({name}) => axios.post('/api/users',{name}), {
-        onSuccess: () => {
-            queryCache.invalidateQueries('users')
-        }
-    })
+  const {data, status, isFetching} = useQuery('users', () => axios.get('/api/users').then(res => res.data.users))
+  const [mutate, mutateObj] = useMutation(({name}) => axios.post('/api/users',{name}), {
+      onMutate: newTodo => {
+          // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+          queryCache.cancelQueries('users')
+      
+          // Snapshot the previous value
+          const previousUsers = queryCache.getQueryData('users')
+      
+          // Optimistically update to the new value
+          queryCache.setQueryData('users', old => [...old, newTodo])
+      
+          // Return the snapshotted value
+          return () => queryCache.setQueryData('users', previousUsers)
+        },
+        // If the mutation fails, use the value returned from onMutate to roll back
+        onError: (err, newUser, rollback) => rollback(),
+        // Always refetch after error or success:
+        onSettled: () => {
+          queryCache.invalidateQueries('users')
+        },
+  })
 
     const [name, setName] = useState('');
 
