@@ -34,3 +34,8 @@
   color: #cdcdcd;
   cursor: unset;
 }
+
+a {
+  color: #fafafa;
+  padding: 5px;
+}
