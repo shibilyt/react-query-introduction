@@ -1,18 +1,23 @@
 import './App.css';
-import { useState } from 'react';
-import { usePaginatedQuery } from 'react-query';
+import { useInfiniteQuery } from 'react-query';
 import axios from 'axios'
-async function fetchSwapi(_key, page){
-  await new Promise(res => setTimeout(res, 1500))
 
-  return axios.get(`https://swapi.dev/api/people?page=${page}`).then(res => res.data)
-}
 
 function App() {
 
-  const [page, setPage] = useState(1);
-  
-  const {resolvedData, latestData, status, isFetching} = usePaginatedQuery(['people', page],fetchSwapi)
+  const {
+    status,
+    data,
+    isFetching,
+    isFetchingMore,
+    fetchMore,
+    canFetchMore,
+  } = useInfiniteQuery('people', (key, cursor = 1) => axios.get(`https://swapi.dev/api/people/?page=${cursor}`).then(res => res.data), {
+    getFetchMore: (lastGroup, allGroups) => {
+      const page = getParameterByName('page', lastGroup.next);
+        return page;
+    },
+  })
 
   return (
     <div className="App">
@@ -34,14 +39,25 @@ function App() {
         {
           status === 'success' && (
           <div>{
-              resolvedData?.results?.length > 0 && resolvedData.results.map(person => (
+            // important to note that now, data is given as an array of results
+              data.map((group,i) => 
+              group?.results?.length > 0 && group.results.map(person => (
                 <PersonCard data={person} key={person.name}/>
+              )
               ))
             }
             
-            <button className="btn" onClick={() => setPage((old) => old - 1)} disabled={page === 1}>prev</button>
-            <button className="btn" onClick={() => setPage((old) => old + 1)}
-        disabled={!latestData?.next}>next</button>
+            <button
+            className='btn'
+           onClick={() => fetchMore()}
+           disabled={!canFetchMore || isFetchingMore}
+         >
+           {isFetchingMore
+             ? 'Loading more...'
+             : canFetchMore
+             ? 'Load More'
+             : 'Nothing more to load'}
+         </button>
             </div>
 
           )
