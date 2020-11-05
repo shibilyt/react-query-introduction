@@ -1,3 +1,14 @@
+Each step is a commit. Checkout to the commit to see code at that step.
+
+1. setup project with redux - 0005672301c8b0fa8e7b177a8ee9cfdb3ea4b2d0
+2. add loading and error states to redux - d94178043cc95760afe67ae65f789c4f89e32a1d
+3. replace with react-query - 75fa104de9225f0d9b8217f20316e3ac79f80d28
+4. add paginated query - 259b10ffd11a59263b7ee4aaa5324a338be6f94d
+5. infinite queries - e6ea3bb61541629f5ab373fc42afaa3fdeff3e74
+6. add mutation with fake mirage api - db2ff23ca90c5c33c9a65d9f7ed3c3bed13639ea
+7. optimistic update and query invalidation - ee9383b83dd302869d1cfe5642ae18406c06751a
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
